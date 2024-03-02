@@ -1,0 +1,54 @@
+---
+title: "Fabiola Draft"
+output: pdf_document
+date: "2024-03-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data = read.csv("data/checkpoints.csv")
+
+## Cleaning
+
+data = na.omit(data) |> unique()
+data = data[data$n_attempt <= 750, ] #Some attempts are really big, consider it outliers
+```
+
+```{r}
+# Load the necessary library
+library(ggplot2)
+library(gridExtra)
+
+# Create separate boxplots for each variable
+plot_eoc <- ggplot(data, aes(x = "", y = EOC)) +
+  geom_boxplot(fill = "red") +
+  labs(y = "EOC") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+plot_n_possible <- ggplot(data, aes(x = "", y = n_possible)) +
+  geom_boxplot(fill = "blue") +
+  labs(y = "n_possible") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+plot_n_correct <- ggplot(data, aes(x = "", y = n_correct)) +
+  geom_boxplot(fill = "green") +
+  labs(y = "n_correct") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+plot_n_attempt <- ggplot(data, aes(x = "", y = n_attempt)) +
+  geom_boxplot(fill = "yellow") +
+  labs(y = "n_attempt") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks.x = element_blank())
+
+# Arrange the boxplots in a grid layout
+grid.arrange(plot_eoc, plot_n_possible, plot_n_correct, plot_n_attempt, nrow = 1)
+
+```
+
