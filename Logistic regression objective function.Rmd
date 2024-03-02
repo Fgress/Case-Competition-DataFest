@@ -1,0 +1,58 @@
+---
+title: "Logistic Regression"
+output: pdf_document
+date: "2024-03-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Load the data
+data <- read.csv("data/checkpoints.csv")
+
+# Clean the data
+data <- na.omit(data) |> unique()
+data <- data[data$n_attempt <= 750, ]
+
+# Prepare the data
+threshold <- median(data$EOC)
+data$difficult <- as.factor(ifelse(data$EOC > threshold, "Difficult", "Not Difficult"))
+
+# Fit a logistic regression model
+model <- glm(difficult ~ EOC + n_attempt, data = data, family = binomial())
+
+# Predict and classify chapters
+data$predicted_difficult <- predict(model, type = "response")
+data$predicted_class <- ifelse(data$predicted_difficult > 0.5, "Difficult", "Not Difficult")
+
+chapter_difficulty_count <- data %>%
+  group_by(chapter_number, predicted_class) %>%
+  summarise(Count = n())
+
+# View the results
+print(chapter_difficulty_count)
+
+```
+```{r}
+library(tidyverse)
+# Count the number of difficult and not difficult predictions per chapter_number
+chapter_difficulty_count <- data %>%
+  group_by(chapter_number, predicted_class) %>%
+  summarise(Count = n()) %>%
+  pivot_wider(names_from = predicted_class, values_from = Count, values_fill = list(Count = 0))
+
+# Calculate the percentage of difficult predictions
+chapter_difficulty_percentage <- chapter_difficulty_count %>%
+  mutate(Difficult_Percentage = Difficult / (Difficult + `Not Difficult`) * 100) %>%
+  arrange(desc(Difficult_Percentage))
+
+# View the results
+print(chapter_difficulty_percentage)
+```
+
+
