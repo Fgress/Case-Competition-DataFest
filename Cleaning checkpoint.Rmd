@@ -50,5 +50,26 @@ plot_n_attempt <- ggplot(data, aes(x = "", y = n_attempt)) +
 # Arrange the boxplots in a grid layout
 grid.arrange(plot_eoc, plot_n_possible, plot_n_correct, plot_n_attempt, nrow = 1)
 
+```{r}
+
+# Sort average EOC by chapter
+
+data <- group_by(data, chapter_number) |>
+        summarize(EOC_avg = mean(EOC), attempt_avg = mean(n_attempt)) |>
+        arrange(EOC_avg)
+
+data_plot <- ggplot(data, aes(x = attempt_avg, y = EOC_avg)) +
+            geom_point() +
+            xlab("Attempt Average") +
+            ylab("EOC Average") +
+            theme(text = element_text(size = 20)) +
+            geom_text(aes(label = chapter_number), vjust = -0.5)
+
+
+data_plot
+
+correlation <- cor(data$attempt_avg, data$EOC_avg)
+correlation
+
 ```
 
