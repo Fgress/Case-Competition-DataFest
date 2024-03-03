@@ -13,11 +13,11 @@ library(dplyr)
 library(ggplot2)
 
 # Load the data
-data <- read.csv("data/checkpoints.csv")
+data <- read.csv("Full data/checkpoints.csv")
 
 # Clean the data
 data <- na.omit(data) |> unique()
-data <- data[data$n_attempt <= 750, ]
+data <- data[data$n_attempt <= 1000, ]
 
 # Prepare the data
 threshold <- median(data$EOC)
