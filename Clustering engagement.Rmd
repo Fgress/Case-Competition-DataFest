@@ -15,20 +15,39 @@ library(tidyverse)
 ```{r}
 data_raw <- read_csv("/Users/fabiolagrace/Downloads/Data Files/page_views.csv")
 
-columns_to_check <- setdiff(names(data_raw), 'tried_again_dt')
-
 data <- data_raw %>%
-  drop_na(columns_to_check) %>%
-  distinct()
+  select(-release, -dt_accessed, -tried_again_clicks, -tried_again_dt, -was_complete, -page, -review_flag) %>%
+  group_by(book, institution_id, class_id, student_id, chapter_number) %>%
+  summarise(
+    engaged = sum(engaged),
+    idle_brief = sum(idle_brief),
+    idle_long = sum(idle_long),
+    off_page_brief = sum(off_page_brief),
+    off_page_long = sum(off_page_long),
+    .groups = 'drop'  # This argument ensures the grouped structure is dropped after summarising
+  ) %>%
+  distinct() %>%  # Remove duplicate rows
+  mutate(engaged_minutes = engaged / (1000 * 60)) %>%
+  arrange(student_id, chapter_number)
 ```
 ```{r}
 data_raw2 <- read_csv("data/page_views.csv")
 
-columns_to_check2 <- setdiff(names(data_raw2), 'tried_again_dt')
-
 data2 <- data_raw2 %>%
-  drop_na(columns_to_check) %>%
-  distinct()
+  select(-release, -dt_accessed, -tried_again_clicks, -tried_again_dt, -was_complete, -page, -review_flag) %>%
+  group_by(book, institution_id, class_id, student_id, chapter_number) %>%
+  summarise(
+    engaged = sum(engaged),
+    idle_brief = sum(idle_brief),
+    idle_long = sum(idle_long),
+    off_page_brief = sum(off_page_brief),
+    off_page_long = sum(off_page_long),
+    .groups = 'drop'  # This argument ensures the grouped structure is dropped after summarising
+  ) %>%
+  distinct() %>%  # Remove duplicate rows
+  mutate(engaged_minutes = engaged / (1000 * 60)) %>%
+  arrange(student_id, chapter_number)
+```
 ```
 
 ```{r}
@@ -49,7 +68,7 @@ X_scaled <- scale(X)
 N <- nrow(X_scaled)
 
 # Range of possible clusters
-K <- 2:10
+K <- 5:15
 
 # Run k-means for each value of K and store the results
 km <- map(K, ~ kmeans(X_scaled, .x, nstart = 30))
