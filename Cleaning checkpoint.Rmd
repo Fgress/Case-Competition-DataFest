@@ -9,12 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-data = read.csv("data/checkpoints.csv")
+data = read.csv("Full data/checkpoints.csv")
 
 ## Cleaning
 
 data = na.omit(data) |> unique()
-data = data[data$n_attempt <= 750, ] #Some attempts are really big, consider it outliers
+data = data[data$n_attempt <= 1000, ] #Some attempts are really big, consider it outliers
 ```
 
 ```{r}
@@ -49,6 +49,8 @@ plot_n_attempt <- ggplot(data, aes(x = "", y = n_attempt)) +
 
 # Arrange the boxplots in a grid layout
 grid.arrange(plot_eoc, plot_n_possible, plot_n_correct, plot_n_attempt, nrow = 1)
+
+```
 
 ```{r}
 
