@@ -1,0 +1,38 @@
+---
+title: "Engagement bar graph"
+author: "heather"
+date: "2024-03-03"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# merge new_page views with cleaned checkpoint data 
+new_page_views = read.csv("data/new_page_views.csv")
+merged_engagement_data <- merge(new_page_views, data, by = "student_id") |>
+              select(student_id, engagement_level, EOC)
+
+head(merged_engagement_data)
+
+
+# average EOC by engagement level
+averages_engagement <- merged_engagement_data %>%
+  group_by(engagement_level) %>%
+  summarise(average_EOC = mean(EOC, na.rm = TRUE))
+
+
+# plotting
+
+ggplot(averages_engagement, aes(x = as.factor(engagement_level), y = average_EOC, fill = as.factor(engagement_level))) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  theme_minimal() +
+  labs(title = "Average EOC Scores by Engagement Level",
+       x = "Engagement Level",
+       y = "Average EOC Score") +
+  scale_fill_brewer(palette = "Spectral") +
+  geom_text(aes(label = round(average_EOC, 2)), vjust = -0.3, color = "black")
+
+```
+
