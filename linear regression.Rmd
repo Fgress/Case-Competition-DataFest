@@ -1,0 +1,39 @@
+---
+title: "Linear regression"
+output: pdf_document
+date: "2024-03-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+data = read.csv("data/checkpoints.csv")
+
+## Cleaning
+
+data = na.omit(data) |> unique()
+data = data[data$n_attempt <= 750, ] #Some attempts are really big, consider it outliers
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+
+# Assuming 'data' is your dataset
+data_long <- data %>%
+  group_by(EOC, construct) %>%
+  summarise(response = mean(response, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(names_from = construct, values_from = response)
+
+# Now 'data' should have one row per 'EOC' and one column for each 'construct' category,
+# with the values being the mean 'response' for that combination.
+
+model = lm(EOC ~ ., data_long)
+summary(model)
+```
+
