@@ -1,0 +1,147 @@
+---
+title: "Engagement clusters"
+output: pdf_document
+date: "2024-03-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyverse)
+```
+
+
+```{r}
+data_raw <- read_csv("/Users/fabiolagrace/Downloads/Data Files/page_views.csv")
+
+columns_to_check <- setdiff(names(data_raw), 'tried_again_dt')
+
+data <- data_raw %>%
+  drop_na(columns_to_check) %>%
+  distinct()
+```
+```{r}
+data_raw2 <- read_csv("data/page_views.csv")
+
+columns_to_check2 <- setdiff(names(data_raw2), 'tried_again_dt')
+
+data2 <- data_raw2 %>%
+  drop_na(columns_to_check) %>%
+  distinct()
+```
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(purrr)
+
+set.seed(123456)
+
+# Select the columns for clustering
+X <- data2 %>% select(engaged, idle_brief, off_page_brief, tried_again_clicks, was_complete)
+
+# Standardize the features
+X_scaled <- scale(X)
+
+# Number of observations
+N <- nrow(X_scaled)
+
+# Range of possible clusters
+K <- 2:10
+
+# Run k-means for each value of K and store the results
+km <- map(K, ~ kmeans(X_scaled, .x, nstart = 30))
+
+# Calculate Calinski-Harabasz index for each k-means result
+summaries <- map(km, ~ {
+  W <- .x$tot.withinss
+  B <- .x$betweenss
+  k <- .x$centers %>% nrow()
+  CHidx <- (B / (k - 1)) / (W / (N - k))
+  tibble(K = k, W = W, B = B, CHidx = CHidx)
+}) %>%
+  bind_rows()
+
+# Plot CH index against the number of clusters
+ggplot(summaries, aes(K, CHidx)) +
+  geom_line(colour = "orange") +
+  geom_point(colour = "cornflowerblue") +
+  ylab("CH Index")
+
+# Find the optimal number of clusters based on the highest CH index
+optimal_number <- summaries %>% filter(CHidx == max(CHidx)) %>% pull(K)
+cat(sprintf("Optimal number of clusters: %d\n", optimal_number))
+
+# Train the K-Means model with the optimal number of clusters
+kmeans_result <- kmeans(X_scaled, centers = optimal_number, nstart = 25)
+
+# Assign the cluster labels as engagement scores
+data$engagement_score <- kmeans_result$cluster
+```
+
+```{r}
+## Now using full dataset, do kmeans on 6 clusters
+
+# Select the columns for clustering
+X <- data %>% select(engaged, idle_brief, off_page_brief, tried_again_clicks, was_complete)
+
+# Standardize the features
+X_scaled <- scale(X)
+
+# Assuming 'X_scaled' is your scaled data matrix or data frame
+kmeans_result <- kmeans(X_scaled, centers = 6, nstart = 25)
+
+# Add the cluster assignments to the data
+data$cluster <- kmeans_result$cluster
+
+# Calculate the average engagement score for each cluster
+cluster_engagement_scores <- data %>%
+  group_by(cluster) %>%
+  summarise(engagement_level = mean(engaged)) %>%
+  arrange(desc(engagement_level))
+
+# Join the cluster engagement scores back to the original data
+data <- data %>%
+  left_join(cluster_engagement_scores, by = "cluster")
+
+data <- data %>%
+  select(-engagement_level.x) %>%
+  rename(engagement_level = engagement_level.y)
+
+# Display the first few rows of the dataframe
+print(head(data))
+
+# Display the engagement scores for each cluster
+print(cluster_engagement_scores)
+
+```
+```{r}
+# Convert 'engagement_level' from milliseconds to minutes DONT RUN MORE THAN ONCE
+data$engagement_level <- data$engagement_level / (1000 * 60)
+```
+
+```{r}
+# Calculate the average 'engagement_level' for each 'chapter_number'
+average_engage_per_chapter_minutes <- data %>%
+  group_by(chapter_number) %>%
+  summarise(`Average Engaged Time (minutes)` = mean(engagement_level)) %>%
+  ungroup()
+
+# Rename the column for clarity
+names(average_engage_per_chapter_minutes)[1] <- "Chapter Number"
+
+# Display the results, sorted by 'Average Engaged Time (minutes)'
+average_engage_per_chapter_minutes <- arrange(average_engage_per_chapter_minutes, `Average Engaged Time (minutes)`)
+
+# Print the results
+print(average_engage_per_chapter_minutes)
+
+
+```
+
+```{r}
+
+```
+
