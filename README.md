@@ -8,8 +8,8 @@ The project focuses on analyzing student engagement with the platform and determ
 
 ## Key Findings
 
-    Clustering: I grouped students based on their engagement levels to better understand how different types of students interact with the platform (Refer to the `clustering_engagement.Rmd`).
+Clustering: I grouped students based on their engagement levels to better understand how different types of students interact with the platform (Refer to the `clustering_engagement.Rmd`).
 
-    Logistic Regression: I categorized each chapter as either "difficult" or "not difficult" based on various features of student interactions. The logistic regression model helped quantify chapter difficulty (See `Logistic_regression_objective_function.Rmd` for details).
+Logistic Regression: I categorized each chapter as either "difficult" or "not difficult" based on various features of student interactions. The logistic regression model helped quantify chapter difficulty (See `Logistic_regression_objective_function.Rmd` for details).
 
-    Recommendations for Improving Learning: From both the model and descriptive analytics, I concluded that improving student engagement in difficult chapters requires more interactive media, better chapter design, and a focus on the psychological well-being of students. (Refer to `media_data.Rmd` and `engagement_bar_graph.Rmd`)
+Recommendations for Improving Learning: From both the model and descriptive analytics, I concluded that improving student engagement in difficult chapters requires more interactive media, better chapter design, and a focus on the psychological well-being of students. (Refer to `media_data.Rmd` and `engagement_bar_graph.Rmd`)
