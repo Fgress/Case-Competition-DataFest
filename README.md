@@ -4,7 +4,7 @@ This project was developed as part of the DataFest competition, organized by the
 
 ## Project Overview
 
-The project focuses on analyzing student engagement with the platform and determining which chapters of the textbook are perceived as difficult. Various data science techniques were applied, including data preprocessing, logistic regression, clustering, and data visualization. The ultimate goal is to identify chapter difficulty and propose strategies to enhance the student learning experience.
+The project focuses on analyzing student engagement with the platform and determining which chapters of the textbook are perceived as difficult. The dataset will be kept private for confidentiality reason. Various data science techniques were applied, including data preprocessing, logistic regression, clustering, and data visualization. The ultimate goal is to identify chapter difficulty and propose strategies to enhance the student learning experience.
 
 ## Key Findings
 
